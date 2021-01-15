@@ -1,4 +1,4 @@
-const controller = require("../controllers/GenarateUrl");
+const controller = require("../controllers/GenerateUrl");
 
 module.exports = function(app) {
     app.use(function(req, res, next) {
@@ -9,6 +9,6 @@ module.exports = function(app) {
         next();
       });
     
-      app.post("/api/genarateUrl", controller.genarateUrl);
+      app.post("/api/generateUrl", controller.generateUrl);
       app.post("/api/deleteUrl", controller.deleteUrl);
 }

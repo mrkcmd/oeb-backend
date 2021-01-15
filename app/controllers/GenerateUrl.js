@@ -4,7 +4,7 @@ const config = require("../config/auth.config");
 const { v4: uuidv4 } = require("uuid");
 const Token = db.token;
 
-exports.genarateUrl = (req, res) => {
+exports.generateUrl = (req, res) => {
   const token = uuidv4();
   Token.create({
     token: token,
