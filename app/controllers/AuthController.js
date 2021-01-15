@@ -5,42 +5,57 @@ const Account = db.account;
 const Role = db.role;
 const Log = db.log;
 const Op = db.Sequelize.Op;
+const Token = db.token;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const { request } = require("express");
 
 exports.signup = (req, res) => {
-  // Save User to Database
-  Account.create({
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    email: req.body.email,
-    password: bcrypt.hashSync(req.body.password, 8),
+  Token.findOne({
+    where: {
+      token: req.body.token,
+    },
   })
-    .then((account) => {
-      if (req.body.roles) {
-        Role.findAll({
-          where: {
-            name: {
-              [Op.or]: req.body.roles,
-            },
-          },
-        }).then((roles) => {
-          account.setRoles(roles).then(() => {
-            res.status(200).send({ message: "User registered successfully!" });
-          });
+    .then((token) => {
+      Account.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 8),
+      })
+        .then((account) => {
+          if (req.body.roles) {
+            Role.findAll({
+              where: {
+                name: {
+                  [Op.or]: req.body.roles,
+                },
+              },
+            }).then((roles) => {
+              account.setRoles(roles).then(() => {
+                res
+                  .status(200)
+                  .send({ message: "User registered successfully!" });
+              });
+            });
+          } else {
+            // user role = 1
+            account.setRoles([1]).then(() => {
+              res
+                .status(200)
+                .send({ message: "User registered successfully!" });
+            });
+          }
+        })
+        .catch((err) => {
+          res.status(500).send({ message: err.message });
         });
-      } else {
-        // user role = 1
-        account.setRoles([1]).then(() => {
-          res.status(200).send({ message: "User registered successfully!" });
-        });
-      }
     })
     .catch((err) => {
-      res.status(500).send({ message: err.message });
+      res.status(404).send({ message: "Token Not Found" });
     });
+  // Save User to Database
 };
 
 exports.signin = (req, res) => {
@@ -94,4 +109,27 @@ exports.signin = (req, res) => {
     .catch((err) => {
       res.status(500).send({ message: err.message });
     });
+};
+
+exports.logOut = (req, res) => {
+  console.log("id: ", req.body.id);
+
+  Account.findOne({
+    where: {
+      id: req.body.id,
+    },
+  }).then((user) => {
+    console.log("account: ", user.id);
+
+    Log.create({
+      msg: "Logout",
+      date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+      accountId: user.id,
+    });
+
+    res.status(200).send({
+      id: user.id,
+      email: user.email,
+    });
+  });
 };
