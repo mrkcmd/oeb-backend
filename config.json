@@ -1,0 +1,7 @@
+{
+	"ssl": {
+		"ca": "./server-ca.pem",
+		"key": "./client-key.pem",
+		"cert": "./client-cert.pem"
+	}
+}
