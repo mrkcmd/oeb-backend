@@ -18,6 +18,7 @@ exports.signup = (req, res) => {
     },
   })
     .then((token) => {
+      if(token != null){
       Account.create({
         firstname: req.body.firstname,
         lastname: req.body.lastname,
@@ -50,7 +51,9 @@ exports.signup = (req, res) => {
         })
         .catch((err) => {
           res.status(500).send({ message: err.message });
-        });
+        });} else {
+          res.status(404).send({ message: "Token Not Found" });
+        }
     })
     .catch((err) => {
       res.status(404).send({ message: "Token Not Found" });
