@@ -136,3 +136,4 @@ exports.logOut = (req, res) => {
     });
   });
 };
+

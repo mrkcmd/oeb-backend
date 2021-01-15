@@ -4,19 +4,28 @@ const config = require("../config/auth.config");
 const { v4: uuidv4 } = require("uuid");
 const Token = db.token;
 
+async function deleteToken(token) {
+  await Token.destroy({
+    where: {
+      token: token,
+    },
+  });
+}
+
 exports.generateUrl = (req, res) => {
   const token = uuidv4();
+
   Token.create({
     token: token,
   }).then((_token) => {
-    res
-      .send({
-        token: _token.token,
+    console.log("token: ", _token.token);
+    setTimeout(() => deleteToken(token), 15*10*100*10);
+    res.send({
+        token: token,
       })
-      .catch((error) => {
-        res.status(500).send({ message: err.message });
-      });
-  });
+  }).catch((err) => {
+    res.status(500).send({message: err.message})
+  })
 };
 
 exports.deleteUrl = (req, res) => {
@@ -33,7 +42,7 @@ exports.deleteUrl = (req, res) => {
         });
       } else {
         res.send({
-          message: `Cannot delete Tutorial with token=${token}. Maybe Tutorial was not found!`,
+          message: `Cannot delete not found!`,
         });
       }
     })
