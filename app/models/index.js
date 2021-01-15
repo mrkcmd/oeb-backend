@@ -8,11 +8,11 @@ const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD,{
     timestamps: false,
   },
   dialectOptions: {
-    ssl: {
-      key: config.ssl.key,
-      cert: config.ssl.cert,
-      ca: config.ssl.ca,
-    },
+    // ssl: {
+    //   key: config.ssl.key,
+    //   cert: config.ssl.cert,
+    //   ca: config.ssl.ca,
+    // },
   },
   operatorsAliases: false,
 
@@ -29,6 +29,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.token = require("./TokonUrl")(sequelize, Sequelize);
 db.account = require("./Account.js")(sequelize, Sequelize);
 db.role = require("./Role.js")(sequelize, Sequelize);
 db.ebook = require("./Ebook")(sequelize, Sequelize);

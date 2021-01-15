@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
 // routes
 require("./app/routes/AccountRote")(app);
 require("./app/routes/AuthRote")(app);
-
+require("./app/routes/GenarateUrlRote")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
