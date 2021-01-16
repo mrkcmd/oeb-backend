@@ -144,7 +144,7 @@ exports.AutoLogOut = (req, res) => {
     },
   }).then((user) => {
     Log.create({
-      msg: "LogoutAuto",
+      msg: "Logout Auto",
       date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
       accountId: user.id,
     });
