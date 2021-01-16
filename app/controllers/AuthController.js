@@ -122,10 +122,29 @@ exports.logOut = (req, res) => {
       id: req.body.id,
     },
   }).then((user) => {
-    console.log("account: ", user.id);
-
     Log.create({
       msg: "Logout",
+      date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+      accountId: user.id,
+    });
+
+    res.status(200).send({
+      id: user.id,
+      email: user.email,
+    });
+  });
+};
+
+
+exports.AutoLogOut = (req, res) => {
+  console.log("id: ", req.body.id);
+  Account.findOne({
+    where: {
+      id: req.body.id,
+    },
+  }).then((user) => {
+    Log.create({
+      msg: "LogoutAuto",
       date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
       accountId: user.id,
     });

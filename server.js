@@ -32,9 +32,11 @@ app.get("/", (req, res) => {
 });
 
 // routes
+// require("./app/controllers/ListEbook")(app);
 require("./app/routes/AccountRote")(app);
 require("./app/routes/AuthRote")(app);
 require("./app/routes/GenerateUrlRote")(app);
+require("./app/routes/EbookRote")(app);
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

@@ -1,6 +1,4 @@
 const db = require("../models");
-const config = require("../config/auth.config");
-// const db = require("../models");
 const { v4: uuidv4 } = require("uuid");
 const Token = db.token;
 
@@ -19,7 +17,7 @@ exports.generateUrl = (req, res) => {
     token: token,
   }).then((_token) => {
     console.log("token: ", _token.token);
-    setTimeout(() => deleteToken(token), 15*10*100*10);
+    setTimeout(() => deleteToken(token), 1000*60*15);
     res.send({
         token: token,
       })
