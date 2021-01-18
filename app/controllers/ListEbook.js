@@ -5,40 +5,45 @@ const db = require("../models");
 const Ebook = db.ebook;
 const Account = db.account;
 
+const path = require("path");
+const cwd = path.join("D:/");
+
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
 });
 
-exports.listFiles  = async (req, res) =>
- {
+exports.listFiles = async (req, res) => {
   const [files] = await gc.bucket("ebook-online").getFiles();
-  var listData = []
+  var listData = [];
   files.forEach((file) => {
-    listData.push(file.name)
-   
+    listData.push(file.name);
   });
   res.send({
-    listData
-  })
-}
+    listData,
+  });
+};
 
 exports.downloadFile = async (req, res) => {
+  destFilename = path.join(cwd, "IMG_0009.JPG");
   const options = {
     // The path to which the file should be downloaded, e.g. "./file.txt"
-    destination: req.body.name,
+    destination: destFilename,
+    
   };
 
   // Downloads the file
-  const download = await gc.bucket("ebook-online").file("/").download(options);
-  console.log("dw", download)
-  // console.log(
-  //   `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
-  // );
-}
+  const download = await gc
+    .bucket("ebook-online")
+    .file("IMG_0009.JPG")
+    .download(options);
+  console.log("dw", options);
+  console.log(
+    `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
+  );
+};
 
 // downloadFile().catch(console.error);
-
 
 exports.AddEbook = (req, res) => {
   Account.findOne({
@@ -64,13 +69,14 @@ exports.AddEbook = (req, res) => {
     });
 };
 
-
 exports.AccountFindAll = (req, res) => {
-    Account.findAll().then((data) => {
-        res.send(data);
-    }).catch(err => {
-        res.status(500).send({
-            message: err.message
-        })
+  Account.findAll()
+    .then((data) => {
+      res.send(data);
     })
-}
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message,
+      });
+    });
+};
