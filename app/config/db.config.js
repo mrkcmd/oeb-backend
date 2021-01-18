@@ -9,7 +9,7 @@ module.exports = {
   HOST: "localhost",
   USER: "root",
   PASSWORD: "",
-  DB: "sawll",
+  DB: "ebook2",
   dialect: "mysql",
   // ssl: {
   //   ca: fs.readFileSync(config.ssl.ca),

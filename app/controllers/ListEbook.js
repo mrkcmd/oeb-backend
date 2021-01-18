@@ -10,47 +10,35 @@ const gc = new Storage({
   projectId: "ebook-onlline",
 });
 
-async function listFiles() {
+exports.listFiles  = async (req, res) =>
+ {
   const [files] = await gc.bucket("ebook-online").getFiles();
-
-  console.log("Files:");
+  var listData = []
   files.forEach((file) => {
-    console.log(file.name);
+    listData.push(file.name)
+   
   });
+  res.send({
+    listData
+  })
 }
 
-async function downloadFile(destFilename) {
+exports.downloadFile = async (req, res) => {
   const options = {
     // The path to which the file should be downloaded, e.g. "./file.txt"
-    destination: destFilename,
+    destination: req.body.name,
   };
 
   // Downloads the file
-  await gc.bucket("ebook-online").file("/EbookPdf").download(options);
-
-  console.log(
-    `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
-  );
+  const download = await gc.bucket("ebook-online").file("/").download(options);
+  console.log("dw", download)
+  // console.log(
+  //   `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
+  // );
 }
 
 // downloadFile().catch(console.error);
-listFiles().catch(console.error);
 
-exports.DownloadEbook = (req, res) => {
-  const destFilename = req.params.name;
-  console.log(destFilename);
-//   const dw = downloadFile(destFilename).catch(console.error);
-
-  const options = {
-    // The path to which the file should be downloaded, e.g. "./file.txt"
-    destination: destFilename,
-  };
-   gc.bucket("ebook-online").file("/EbookPdf").download(options).then((file) => {
-       res.status(200).send({
-           url : file
-       })
-   })
-};
 
 exports.AddEbook = (req, res) => {
   Account.findOne({

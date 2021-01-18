@@ -10,6 +10,7 @@ module.exports = function(app) {
       });
     
       app.post("/api/ebook/add", controller.AddEbook);
-      app.get("/api/download/:name", controller.DownloadEbook);
-      app.get("/api/ebook", controller.AccountFindAll);
+      app.get("/api/download", controller.downloadFile);
+      app.get("/api/ebook/findaccount", controller.AccountFindAll);
+      app.get("/api/ebookfindall", controller.listFiles);
 }

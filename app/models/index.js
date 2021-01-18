@@ -14,7 +14,7 @@ const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD,{
     //   ca: config.ssl.ca,
     // },
   },
-  operatorsAliases: false,
+  operatorsAliases: 0,
 
   pool: {
     max: config.pool.max,

@@ -3,12 +3,6 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING
       },
-      ip: {
-        type: Sequelize.STRING
-      },
-      downlond:{
-        type: Sequelize.DATE,
-      }
     });
   
     return Ebook;
