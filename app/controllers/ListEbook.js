@@ -48,7 +48,7 @@ exports.downloadFile = async (req, res) => {
 exports.AddEbook = (req, res) => {
   Account.findOne({
     where: {
-      id: req.param.id,
+      id: req.body.account.id,
     },
   })
     .then((account) => {
@@ -79,4 +79,16 @@ exports.AccountFindAll = (req, res) => {
         message: err.message,
       });
     });
+};
+
+exports.AccountFindEbook = (req, res) => {
+  Ebook.findAll({
+    where: req.body.id
+  }).then((data) => {
+    res.status(200).send(data)
+  }).catch((err) => {
+    res.status(500).send({
+      message: err.message
+    })
+  })
 };

@@ -13,4 +13,5 @@ module.exports = function(app) {
       app.get("/api/download", controller.downloadFile);
       app.get("/api/ebook/findaccount", controller.AccountFindAll);
       app.get("/api/ebookfindall", controller.listFiles);
+      app.get("/api/AccountFindEbook", controller.AccountFindEbook);
 }
