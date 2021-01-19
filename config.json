@@ -1,8 +1,11 @@
+
 {
 	"ssl": {
 		"ca": "./server-ca.pem",
 		"key": "./client-key.pem",
 		"cert": "./client-cert.pem"
 	},
+	"socketPath": "/cloudsql/ebook-onlline:asia-southeast1:ebookonline-sql",
+	
 	"ebook": "./ebook-onlline-c435fd7b429d.json"
 }

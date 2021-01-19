@@ -16,6 +16,7 @@ module.exports = {
     key: fs.readFileSync(config.ssl.key),
     cert: fs.readFileSync(config.ssl.cert),
   },
+  socketPath: "/cloudsql/ebook-onlline:asia-southeast1:ebookonline-sql",
   pool: {
     max: 5,
     min: 0,
