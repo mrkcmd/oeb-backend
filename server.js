@@ -4,7 +4,7 @@ const cors = require("cors");
 const app = express();
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  origin: "https://floating-scrubland-13461.herokuapp.com/?fbclid=IwAR1bICZ7SIPl1j7S8dovvokPAP7z9zJGbfsl-iJ-GlUzDlRx-dYiacM3msE",
 };
 
 app.use(cors(corsOptions));
