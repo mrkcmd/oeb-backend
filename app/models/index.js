@@ -8,13 +8,6 @@ const sequelize = new Sequelize(config.DB, config.USER, config.PASSWORD,{
   define: {
     timestamps: false,
   },
-  // dialectOptions: {
-  //   ssl: {
-  //     key: config.ssl.key,
-  //     cert: config.ssl.cert,
-  //     ca: config.ssl.ca,
-  //   },
-  // },
   operatorsAliases: 0,
 
   pool: {
