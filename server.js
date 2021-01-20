@@ -5,6 +5,7 @@ const app = express();
 
 var corsOptions = {
   origin: "https://floating-scrubland-13461.herokuapp.com",
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
