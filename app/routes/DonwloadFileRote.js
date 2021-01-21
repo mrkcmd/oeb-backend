@@ -10,5 +10,5 @@ module.exports = function(app) {
         next();
       });
     
-      app.get("/api/files", controller.download);
+      app.get("/api/files/:name", controller.download);
 }
