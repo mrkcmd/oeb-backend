@@ -65,7 +65,7 @@ exports.AccountFindAll = (req, res) => {
 exports.AccountFindEbook = (req, res) => {
   Ebook.findAll({
     where: {
-      accountId: req.body.account.id
+      accountId: req.body.id
     }
   }).then((data) => {
     res.status(200).send(data)
