@@ -4,7 +4,7 @@ module.exports = (sequelize, Sequelize) => {
         type: Sequelize.STRING
       },
       purchased: {
-        type: Sequelize.DATE
+        type: Sequelize.STRING
       }
     });
   

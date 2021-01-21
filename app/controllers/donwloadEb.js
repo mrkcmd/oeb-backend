@@ -23,6 +23,8 @@ exports.download = async (req, res) => {
     .file(fileName)
     .download(options);
 
+    
+
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
       res.status(500).send({
