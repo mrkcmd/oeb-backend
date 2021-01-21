@@ -10,7 +10,7 @@ const gc = new Storage({
 });
 
 exports.download = async (req, res) => {
-  const directoryPath = __basedir + "/resources/static/assets/download/";
+  const directoryPath = __basedir + "/";
   const fileName = req.body.name;
 
   destFilename = path.join(directoryPath, fileName);
@@ -23,7 +23,7 @@ exports.download = async (req, res) => {
     .file(fileName)
     .download(options);
 
-    
+
 
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
