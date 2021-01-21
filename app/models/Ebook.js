@@ -3,6 +3,9 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING
       },
+      purchased: {
+        type: Sequelize.DATE
+      }
     });
   
     return Ebook;

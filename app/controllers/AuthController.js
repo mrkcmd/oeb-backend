@@ -18,42 +18,44 @@ exports.signup = (req, res) => {
     },
   })
     .then((token) => {
-      if(token != null){
-      Account.create({
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 8),
-      })
-        .then((account) => {
-          if (req.body.roles) {
-            Role.findAll({
-              where: {
-                name: {
-                  [Op.or]: req.body.roles,
+      if (token != null) {
+        Account.create({
+          firstname: req.body.firstname,
+          lastname: req.body.lastname,
+          email: req.body.email,
+          password: bcrypt.hashSync(req.body.password, 8),
+          status: false,
+        })
+          .then((account) => {
+            if (req.body.roles) {
+              Role.findAll({
+                where: {
+                  name: {
+                    [Op.or]: req.body.roles,
+                  },
                 },
-              },
-            }).then((roles) => {
-              account.setRoles(roles).then(() => {
+              }).then((roles) => {
+                account.setRoles(roles).then(() => {
+                  res
+                    .status(200)
+                    .send({ message: "User registered successfully!" });
+                });
+              });
+            } else {
+              // user role = 1
+              account.setRoles([1]).then(() => {
                 res
                   .status(200)
                   .send({ message: "User registered successfully!" });
               });
-            });
-          } else {
-            // user role = 1
-            account.setRoles([1]).then(() => {
-              res
-                .status(200)
-                .send({ message: "User registered successfully!" });
-            });
-          }
-        })
-        .catch((err) => {
-          res.status(500).send({ message: err.message });
-        });} else {
-          res.status(404).send({ message: "Token Not Found" });
-        }
+            }
+          })
+          .catch((err) => {
+            res.status(500).send({ message: err.message });
+          });
+      } else {
+        res.status(404).send({ message: "Token Not Found" });
+      }
     })
     .catch((err) => {
       res.status(404).send({ message: "Token Not Found" });
@@ -93,20 +95,38 @@ exports.signin = (req, res) => {
         for (let i = 0; i < roles.length; i++) {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
-        Log.create({
-          msg: "Login",
-          date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
-          accountId: user.id,
-        });
 
-        console.log("user: ", user.id);
+        if (user.status == false) {
+          if (
+            Log.create({
+              msg: "Login",
+              date: require("moment")()
+                .add(7, "hours")
+                .format("DD-MM-YYYY HH:mm:ss"),
+              accountId: user.id,
+            })
+          ) {
+            Account.update(
+              { status: true },
+              {
+                where: {
+                  id: user.id,
+                },
+              }
+            );
+          }
 
-        res.status(200).send({
-          id: user.id,
-          email: user.email,
-          roles: authorities,
-          accessToken: token,
-        });
+          res.status(200).send({
+            id: user.id,
+            email: user.email,
+            roles: authorities,
+            accessToken: token,
+          });
+        }else {
+          res.status(500).send({
+            message: "User Already Logged In."
+          })
+        }
       });
     })
     .catch((err) => {
@@ -124,9 +144,15 @@ exports.logOut = (req, res) => {
   }).then((user) => {
     Log.create({
       msg: "Logout",
-      date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+      date: require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss"),
       accountId: user.id,
     });
+
+    Account.update({status: false}, {
+      where: {
+        id: user.id
+      }
+    })
 
     res.status(200).send({
       id: user.id,
@@ -134,7 +160,6 @@ exports.logOut = (req, res) => {
     });
   });
 };
-
 
 exports.AutoLogOut = (req, res) => {
   console.log("id: ", req.body.id);
@@ -145,9 +170,15 @@ exports.AutoLogOut = (req, res) => {
   }).then((user) => {
     Log.create({
       msg: "Logout Auto",
-      date: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+      date: require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss"),
       accountId: user.id,
     });
+
+    Account.update({status: false}, {
+      where: {
+        id: user.id
+      }
+    })
 
     res.status(200).send({
       id: user.id,
@@ -155,4 +186,3 @@ exports.AutoLogOut = (req, res) => {
     });
   });
 };
-

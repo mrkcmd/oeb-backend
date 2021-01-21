@@ -1,39 +1,33 @@
-// const {Storage} = require('@google-cloud/storage');
+const fs = require("fs");
+var config = require("../../config.json");
+const request = require("request");
+const { Storage } = require("@google-cloud/storage");
+const path = require("path");
 
+const gc = new Storage({
+  keyFilename: config.ebook,
+  projectId: "ebook-onlline",
+});
 
-// const gc = new Storage({
-//     keyFilename: config.ebook,
-//     projectId: "ebook-onlline",
-//   });
+exports.download = async (req, res) => {
+  const directoryPath = __basedir + "/resources/static/assets/download/";
+  const fileName = req.body.name;
 
-// const myBucket = gc.bucket('ebook-online');
+  destFilename = path.join(directoryPath, fileName);
+  const options = {
+    destination: destFilename,
+  };
 
+  const download = await gc
+    .bucket("ebook-online")
+    .file(fileName)
+    .download(options);
 
-// //-
-// // Generate a URL that allows temporary access to list files in a bucket.
-// //-
-// const request = require('request');
-
-// const config = {
-//   action: 'list',
-//   expires: '03-17-2025'
-// };
-
-// bucket.getSignedUrl(config, function(err, url) {
-//   if (err) {
-//     console.error(err);
-//     return;
-//   }
-
-//   // The bucket is now available to be listed from this URL.
-//   request(url, function(err, resp) {
-//      resp.statusCode = 200
-//   });
-// });
-
-// //-
-// // If the callback is omitted, we'll return a Promise.
-// //-
-// bucket.getSignedUrl(config).then(function(data) {
-//   const url = data[0];
-// });
+  res.download(directoryPath + fileName, fileName, (err) => {
+    if (err) {
+      res.status(500).send({
+        message: "Could not download the file. " + err,
+      });
+    }
+  });
+};

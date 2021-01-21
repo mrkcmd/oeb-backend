@@ -6,7 +6,7 @@ const Ebook = db.ebook;
 const Account = db.account;
 
 const path = require("path");
-const cwd = path.join("D:/");
+
 
 const gc = new Storage({
   keyFilename: config.ebook,
@@ -24,26 +24,6 @@ exports.listFiles = async (req, res) => {
   });
 };
 
-exports.downloadFile = async (req, res) => {
-  destFilename = path.join(cwd, "IMG_0009.JPG");
-  const options = {
-    // The path to which the file should be downloaded, e.g. "./file.txt"
-    destination: destFilename,
-    
-  };
-
-  // Downloads the file
-  const download = await gc
-    .bucket("ebook-online")
-    .file("IMG_0009.JPG")
-    .download(options);
-  console.log("dw", options);
-  console.log(
-    `gs://${bucketName}/${srcFilename} downloaded to ${destFilename}.`
-  );
-};
-
-// downloadFile().catch(console.error);
 
 exports.AddEbook = (req, res) => {
   Account.findOne({
@@ -55,6 +35,7 @@ exports.AddEbook = (req, res) => {
       console.log(account);
       Ebook.create({
         name: req.body.name,
+        purchased: require("moment")().add(7,'hours').format("DD-MM-YYYY HH:mm:ss"),
         //   ip: req.body.ip,
         //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
         accountId: account.id,
