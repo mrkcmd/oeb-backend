@@ -48,3 +48,21 @@ exports.getListFiles = async (req, res) => {
     res.status(200).send(url);
   });
 };
+
+exports.deleteFile = (req, res) => {
+    const fileName  = req.body.name
+
+    const path = __basedir + "/" + fileName
+
+    fs.unlink(path, (err) => {
+        if (err) {
+          console.error(err)
+          return 
+        }
+    })
+    res.status(200).send({
+        message: "delete file "
+    })
+
+}
+
