@@ -123,6 +123,7 @@ exports.signin = (req, res) => {
             accessToken: token,
           });
         }else {
+
           res.status(500).send({
             message: "User Already Logged In."
           })
@@ -186,3 +187,19 @@ exports.AutoLogOut = (req, res) => {
     });
   });
 };
+
+
+exports.kicklogin = (req, res) => {
+  Account.update({
+    status: false
+  },
+  {
+    where: {
+      email: req.body.email
+    }
+  })
+
+  res.status(200).send({
+    email: req.body.email
+  })
+}
