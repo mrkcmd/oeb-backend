@@ -95,38 +95,20 @@ exports.signin = (req, res) => {
           authorities.push("ROLE_" + roles[i].name.toUpperCase());
         }
 
-        if (user.status == false) {
-          if (
-            Log.create({
-              msg: "Login",
-              date: require("moment")()
-                .add(7, "hours")
-                .format("DD-MM-YYYY HH:mm:ss"),
-              accountId: user.id,
-            })
-          ) {
-            Account.update(
-              { status: true },
-              {
-                where: {
-                  id: user.id,
-                },
-              }
-            );
-          }
+        Log.create({
+          msg: "Login",
+          date: require("moment")()
+            .add(7, "hours")
+            .format("DD-MM-YYYY HH:mm:ss"),
+          accountId: user.id,
+        });
 
-          res.status(200).send({
-            id: user.id,
-            email: user.email,
-            roles: authorities,
-            accessToken: token,
-          });
-        }else {
-
-          res.status(500).send({
-            message: "User Already Logged In."
-          })
-        }
+        res.status(200).send({
+          id: user.id,
+          email: user.email,
+          roles: authorities,
+          accessToken: token,
+        });
       });
     })
     .catch((err) => {
@@ -168,13 +150,9 @@ exports.AutoLogOut = (req, res) => {
       accountId: user.id,
     });
 
-
     res.status(200).send({
       id: user.id,
       email: user.email,
     });
   });
 };
-
-
-
