@@ -4,9 +4,8 @@ const { account } = require("../models");
 const db = require("../models");
 const Ebook = db.ebook;
 const Account = db.account;
-
+const Role = db.role;
 const path = require("path");
-
 
 const gc = new Storage({
   keyFilename: config.ebook,
@@ -24,7 +23,6 @@ exports.listFiles = async (req, res) => {
   });
 };
 
-
 exports.AddEbook = (req, res) => {
   Account.findOne({
     where: {
@@ -35,7 +33,9 @@ exports.AddEbook = (req, res) => {
       console.log(account);
       Ebook.create({
         name: req.body.name,
-        purchased: require("moment")().add(7,'hours').format("DD-MM-YYYY HH:mm:ss"),
+        purchased: require("moment")()
+          .add(7, "hours")
+          .format("DD-MM-YYYY HH:mm:ss"),
         //   ip: req.body.ip,
         //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
         accountId: account.id,
@@ -65,15 +65,17 @@ exports.AccountFindAll = (req, res) => {
 exports.AccountFindEbook = (req, res) => {
   Ebook.findAll({
     where: {
-      accountId: req.body.id
-    }
-  }).then((data) => {
-    res.status(200).send(data)
-  }).catch((err) => {
-    res.status(500).send({
-      message: err.message
-    })
+      accountId: req.body.id,
+    },
   })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        message: err.message,
+      });
+    });
 };
 
 

@@ -12,9 +12,6 @@ module.exports = (sequelize, Sequelize) => {
     lastname:{
       type: Sequelize.STRING,
       
-    },
-    status: {
-      type: Sequelize.BOOLEAN,
     }
     
   }

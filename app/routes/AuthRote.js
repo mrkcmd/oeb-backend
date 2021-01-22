@@ -23,6 +23,6 @@ module.exports = function(app) {
 
   app.post("/api/auth/logout", controller.logOut);
   app.post("/api/auth/autologout", controller.AutoLogOut);
-  app.post("/api/auth/kicklogin", controller.kicklogin);
+  
 
 };

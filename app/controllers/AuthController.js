@@ -149,12 +149,6 @@ exports.logOut = (req, res) => {
       accountId: user.id,
     });
 
-    Account.update({status: false}, {
-      where: {
-        id: user.id
-      }
-    })
-
     res.status(200).send({
       id: user.id,
       email: user.email,
@@ -175,11 +169,6 @@ exports.AutoLogOut = (req, res) => {
       accountId: user.id,
     });
 
-    Account.update({status: false}, {
-      where: {
-        id: user.id
-      }
-    })
 
     res.status(200).send({
       id: user.id,
@@ -189,17 +178,4 @@ exports.AutoLogOut = (req, res) => {
 };
 
 
-exports.kicklogin = (req, res) => {
-  Account.update({
-    status: false
-  },
-  {
-    where: {
-      email: req.body.email
-    }
-  })
 
-  res.status(200).send({
-    email: req.body.email
-  })
-}

@@ -8,7 +8,6 @@ module.exports = function(app) {
         );
         next();
       });
-    
       app.post("/api/ebook/add", controller.AddEbook);
       app.get("/api/ebook/findaccount", controller.AccountFindAll);
       app.get("/api/ebookfindall", controller.listFiles);
