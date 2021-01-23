@@ -119,7 +119,7 @@ exports.getListFiles = async (req, res) => {
         await pdfdoc.getPageCount()
       );
 
-      const stamtext = account.firstname +" "+account.lastname +"\n" +account.email +"\n" + req.body.ip +"download" +time
+      const stamtext = await account.firstname +" "+account.lastname +"\n" +account.email +"\n" + req.body.ip +"download" +time
 
       stamper.stampText(
         pdfdoc,
