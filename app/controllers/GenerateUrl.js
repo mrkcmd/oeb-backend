@@ -16,7 +16,7 @@ exports.generateUrl = (req, res) => {
   Token.create({
     token: token,
   }).then((_token) => {
-    console.log("token: ", _token.token);
+    
     setTimeout(() => deleteToken(token), 1000*60*15);
     res.send({
         token: token,

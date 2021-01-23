@@ -117,7 +117,7 @@ exports.signin = (req, res) => {
 };
 
 exports.logOut = (req, res) => {
-  console.log("id: ", req.body.id);
+ 
 
   Account.findOne({
     where: {
@@ -138,7 +138,7 @@ exports.logOut = (req, res) => {
 };
 
 exports.AutoLogOut = (req, res) => {
-  console.log("id: ", req.body.id);
+ 
   Account.findOne({
     where: {
       id: req.body.id,

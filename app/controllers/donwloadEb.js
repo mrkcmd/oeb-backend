@@ -4,9 +4,13 @@ const request = require("request");
 const { Storage } = require("@google-cloud/storage");
 const path = require("path");
 const { PDFNet } = require("@pdftron/pdfnet-node");
-const mimeType = require('mimeType');
-
-
+const mimeType = require("mimeType");
+const db = require("../models");
+const Account = db.account;
+const Ebook = db.ebook;
+const LogDownload = db.logDownload;
+var time = require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
+let ebookId;
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
@@ -15,6 +19,26 @@ const gc = new Storage({
 exports.download = async (req, res) => {
   const directoryPath = __basedir + "/";
   const fileName = req.params.name;
+
+  Ebook.findOne({
+    where: {
+      id: ebookId
+    },
+  }).then((data) => {
+  
+    Ebook.update(
+      {
+        downloaded: data.downloaded + 1,
+      },
+      {
+        where: {
+          id: ebookId
+        },
+      }
+    );
+  });
+
+ 
 
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
@@ -33,6 +57,26 @@ exports.getListFiles = async (req, res) => {
   const options = {
     destination: destFilename,
   };
+  ebookId = req.body.id;
+
+  let account;
+
+ await Account.findOne({
+    where: {
+      id: req.body.accountId,
+    },
+  }).then((data) => {
+    account = data;
+    
+  });
+
+  LogDownload.create({
+    ebook: fileName,
+    date: time,
+    ip: req.body.ip,
+    accountId: req.body.accountId
+  })
+
 
   const download = await gc
     .bucket("ebook-online")
@@ -46,7 +90,51 @@ exports.getListFiles = async (req, res) => {
       });
     }
 
+    let ext = path.parse(fileName).ext;
+    
+    if (ext !== ".pdf") {
+      res.statusCode = 500;
+      res.end(`File is not a PDF. Please convert it first.`);
+    }
+    const inputPath = path.resolve(__basedir, fileName);
+    const outputPath = path.resolve(__basedir, `${fileName}`);
+    const main = async () => {
+      const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
+      await pdfdoc.initSecurityHandler();
+
+      const stamper = await PDFNet.Stamper.create(
+        PDFNet.Stamper.SizeType.e_relative_scale,
+        0.5,
+        0.5
+      ); // Stamp size is relative to the size of the crop box of the destination page
+      stamper.setAlignment(
+        PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
+        PDFNet.Stamper.VerticalAlignment.e_vertical_center
+      );
+      const redColorPt = await PDFNet.ColorPt.init(0.5, 0, 0);
+      stamper.setFontColor(redColorPt);
+      stamper.setOpacity(0.3);
+      stamper.setRotation(-40);
+      const pgSet = await PDFNet.PageSet.createRange(
+        1,
+        await pdfdoc.getPageCount()
+      );
+
+      const stamtext = account.firstname +" "+account.lastname +"\n" +account.email +"\n" + req.body.ip +"download" +time
+
+      stamper.stampText(
+        pdfdoc,
+        stamtext,
+        pgSet
+      );
+
+      pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
+    };
+
+    PDFNetEndpoint(main, outputPath);
+
     let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
+    // let url = "http://localhost:8080/api/files/" + fileName;
 
     res.status(200).send(url);
   });
@@ -68,65 +156,10 @@ exports.deleteFile = (req, res) => {
   });
 };
 
-exports.watermark = (req, res) => {
-  const filename = req.params.filename;
-  const watermark = req.params.watermark;
-  let ext = path.parse(filename).ext;
-
-  if (ext !== ".pdf") {
-    res.statusCode = 500;
-    res.end(`File is not a PDF. Please convert it first.`);
-  }
-  const inputPath = path.resolve(__dirname, filename);
-  const outputPath = path.resolve(
-    __dirname,
-  
-    `${filename}_watermarked.pdf`
-  );
-  const main = async () => {
-    const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
-    await pdfdoc.initSecurityHandler();
-
-    const stamper = await PDFNet.Stamper.create(
-      PDFNet.Stamper.SizeType.e_relative_scale,
-      0.5,
-      0.5
-    ); // Stamp size is relative to the size of the crop box of the destination page
-    stamper.setAlignment(
-      PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
-      PDFNet.Stamper.VerticalAlignment.e_vertical_center
-    );
-    const redColorPt = await PDFNet.ColorPt.init(1, 0, 0);
-    stamper.setFontColor(redColorPt);
-    const pgSet = await PDFNet.PageSet.createRange(
-      1,
-      await pdfdoc.getPageCount()
-    );
-    stamper.stampText(pdfdoc, watermark, pgSet);
-
-    pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
-  };
-
-  PDFNetEndpoint(main, outputPath, res);
-};
-
-const PDFNetEndpoint = (main, pathname, res) => {
+const PDFNetEndpoint = (main, pathname) => {
   PDFNet.runWithCleanup(main) // you can add the key to PDFNet.runWithCleanup(main, process.env.PDFTRONKEY)
     .then(() => {
       PDFNet.shutdown();
-      fs.readFile(pathname, (err, data) => {
-        if (err) {
-          res.statusCode = 500;
-          res.send(`Error getting the file: ${err}.`);
-        } else {
-          const ext = path.parse(pathname).ext;
-          res.setHeader("Content-type", mimeType[ext] || "text/plain");
-          res.send(data);
-        }
-      });
-    })
-    .catch((error) => {
-      res.statusCode = 500;
-      res.send(error);
+      fs.readFile(pathname, (err, data) => {});
     });
 };

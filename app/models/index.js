@@ -28,6 +28,7 @@ db.account = require("./Account.js")(sequelize, Sequelize);
 db.role = require("./Role.js")(sequelize, Sequelize);
 db.ebook = require("./Ebook")(sequelize, Sequelize);
 db.log = require("./LogAction")(sequelize, Sequelize);
+db.logDownload = require("./LogDownload")(sequelize, Sequelize);
 
 db.account.hasMany(db.ebook,{
   as: "ebook",
@@ -57,6 +58,15 @@ db.log.belongsTo(db.account, {
   foreignKey: "accountId",
   as: "account",
 });
+
+db.account.hasMany(db.log,{
+  as: "logdownload",
+} );
+
+db.logDownload.belongsTo(db.account, {
+  foreignKey: "accountId", 
+  as: "account"
+})
 
 
 

@@ -4,9 +4,7 @@ const { account } = require("../models");
 const db = require("../models");
 const Ebook = db.ebook;
 const Account = db.account;
-const Role = db.role;
-const path = require("path");
-
+const LogDownload = db.logDownload
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
@@ -30,7 +28,7 @@ exports.AddEbook = (req, res) => {
     },
   })
     .then((account) => {
-      console.log(account);
+     
       Ebook.create({
         name: req.body.name,
         purchased: require("moment")()
@@ -38,6 +36,7 @@ exports.AddEbook = (req, res) => {
           .format("DD-MM-YYYY HH:mm:ss"),
         //   ip: req.body.ip,
         //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+        downloaded: 0,
         accountId: account.id,
       });
       res.status(200).send({
@@ -89,5 +88,20 @@ exports.AccountFindEbook = (req, res) => {
       });
     });
 };
+
+exports.listLogDownload = (req, res) => {
+
+  LogDownload.findAll({
+    where:{
+      accountId : req.body.id
+    } 
+  }).then((data) => {
+    res.status(200).send(data)
+  }).catch((err) => {
+    res.status(500).send({
+      message: err.message
+    })
+  })
+}
 
 

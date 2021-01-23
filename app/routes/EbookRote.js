@@ -11,5 +11,6 @@ module.exports = function(app) {
       app.post("/api/ebook/add", controller.AddEbook);
       app.get("/api/ebook/findaccount", controller.AccountFindAll);
       app.get("/api/ebookfindall", controller.listFiles);
-      app.post("/api/AccountFindEbook", controller.AccountFindEbook);
+      app.post("/api/accountFindEbook", controller.AccountFindEbook);
+      app.post("/api/logDownload", controller.listLogDownload);
 }

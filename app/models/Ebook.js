@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       purchased: {
         type: Sequelize.STRING
+      },
+      downloaded: {
+        type: Sequelize.INTEGER
       }
     });
   
