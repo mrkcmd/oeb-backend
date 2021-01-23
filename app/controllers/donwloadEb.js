@@ -57,6 +57,7 @@ exports.getListFiles = async (req, res) => {
     ebookId = req.body.id;
 
     let account;
+    let book
 
     Account.findOne({
       where: {
@@ -65,6 +66,7 @@ exports.getListFiles = async (req, res) => {
     }).then((data) => {
       account = data;
     });
+    
 
     LogDownload.create({
       ebook: fileName,
@@ -72,6 +74,14 @@ exports.getListFiles = async (req, res) => {
       ip: req.body.ip,
       accountId: req.body.accountId,
     });
+
+    Ebook.findOne({
+      where: {
+        name: fileName
+      }
+    }).then((ebook) => {
+      book = ebook
+    })
 
     const download = await gc
       .bucket("ebook-online")
@@ -123,7 +133,8 @@ exports.getListFiles = async (req, res) => {
           "\n" +
           `${req.body.ip}` +
           "จำนวนครั้งดาวน์โหลด " +
-          `${account.downloaded}` +
+          " "
+          `${book.downloaded}` +
           time;
 
         stamper.stampText(pdfdoc, stamtext, pgSet);
