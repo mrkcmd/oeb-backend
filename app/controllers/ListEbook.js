@@ -69,7 +69,19 @@ exports.AccountFindEbook = (req, res) => {
     },
   })
     .then((data) => {
-      res.status(200).send(data);
+      Account.findAll({
+        where: {
+          id: req.body.id
+        }
+      }).then((account) => {
+        res.status(200).send({
+          account: account,
+          ebook: data
+        });
+
+      })
+      
+     
     })
     .catch((err) => {
       res.status(500).send({
