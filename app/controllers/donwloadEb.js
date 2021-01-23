@@ -4,7 +4,6 @@ const request = require("request");
 const { Storage } = require("@google-cloud/storage");
 const path = require("path");
 const { PDFNet } = require("@pdftron/pdfnet-node");
-const mimeType = require("mimeType");
 const db = require("../models");
 const Account = db.account;
 const Ebook = db.ebook;
