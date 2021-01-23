@@ -133,7 +133,6 @@ exports.getListFiles = async (req, res) => {
           "\n" +
           `${req.body.ip}` +
           "จำนวนครั้งดาวน์โหลด " +
-          " "
           `${book.downloaded}` +
           time;
 
