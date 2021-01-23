@@ -21,23 +21,20 @@ exports.download = async (req, res) => {
 
   Ebook.findOne({
     where: {
-      id: ebookId
+      id: ebookId,
     },
   }).then((data) => {
-  
     Ebook.update(
       {
         downloaded: data.downloaded + 1,
       },
       {
         where: {
-          id: ebookId
+          id: ebookId,
         },
       }
     );
   });
-
- 
 
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
@@ -49,95 +46,102 @@ exports.download = async (req, res) => {
 };
 
 exports.getListFiles = async (req, res) => {
-  const directoryPath = __basedir + "/";
-  const fileName = req.body.name;
+  try {
+    const directoryPath = __basedir + "/";
+    const fileName = req.body.name;
 
-  destFilename = path.join(directoryPath, fileName);
-  const options = {
-    destination: destFilename,
-  };
-  ebookId = req.body.id;
-
-  let account;
-
-  Account.findOne({
-    where: {
-      id: req.body.accountId,
-    },
-  }).then((data) => {
-    account = data;
-    
-  });
-
-  LogDownload.create({
-    ebook: fileName,
-    date: time,
-    ip: req.body.ip,
-    accountId: req.body.accountId
-  })
-
-  
-
-
-  const download = await gc
-    .bucket("ebook-online")
-    .file(fileName)
-    .download(options);
-
-  fs.readdir(directoryPath, function (err, files) {
-    if (err) {
-      res.status(500).send({
-        message: "Unable to scan files!",
-      });
-    }
-
-    let ext = path.parse(fileName).ext;
-    
-    if (ext !== ".pdf") {
-      res.statusCode = 500;
-      res.end(`File is not a PDF. Please convert it first.`);
-    }
-    const inputPath = path.resolve(__basedir, fileName);
-    const outputPath = path.resolve(__basedir, `${fileName}`);
-    const main = async () => {
-      const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
-      await pdfdoc.initSecurityHandler();
-
-      const stamper = await PDFNet.Stamper.create(
-        PDFNet.Stamper.SizeType.e_relative_scale,
-        0.5,
-        0.5
-      ); // Stamp size is relative to the size of the crop box of the destination page
-      stamper.setAlignment(
-        PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
-        PDFNet.Stamper.VerticalAlignment.e_vertical_center
-      );
-      const redColorPt = await PDFNet.ColorPt.init(0.5, 0, 0);
-      stamper.setFontColor(redColorPt);
-      stamper.setOpacity(0.3);
-      stamper.setRotation(-40);
-      const pgSet = await PDFNet.PageSet.createRange(
-        1,
-        await pdfdoc.getPageCount()
-      );
-
-      const stamtext = await `${account.firstname}`+ `${account.lastname}` +"\n" +`${account.email}` +"\n" + `${req.body.ip}` +"จำนวนครั้งดาวน์โหลด "+ `${account.downloaded}` +time
-
-      stamper.stampText(
-        pdfdoc,
-        stamtext,
-        pgSet
-      );
-
-      pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
+    destFilename = path.join(directoryPath, fileName);
+    const options = {
+      destination: destFilename,
     };
+    ebookId = req.body.id;
 
-    PDFNetEndpoint(main, outputPath);
+    let account;
 
-    let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
+    Account.findOne({
+      where: {
+        id: req.body.accountId,
+      },
+    }).then((data) => {
+      account = data;
+    });
 
-    res.status(200).send(url);
-  });
+    LogDownload.create({
+      ebook: fileName,
+      date: time,
+      ip: req.body.ip,
+      accountId: req.body.accountId,
+    });
+
+    const download = await gc
+      .bucket("ebook-online")
+      .file(fileName)
+      .download(options);
+
+    fs.readdir(directoryPath, function (err, files) {
+      if (err) {
+        res.status(500).send({
+          message: "Unable to scan files!",
+        });
+      }
+
+      let ext = path.parse(fileName).ext;
+
+      if (ext !== ".pdf") {
+        res.statusCode = 500;
+        res.end(`File is not a PDF. Please convert it first.`);
+      }
+      const inputPath = path.resolve(__basedir, fileName);
+      const outputPath = path.resolve(__basedir, `${fileName}`);
+      const main = async () => {
+        const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
+        await pdfdoc.initSecurityHandler();
+
+        const stamper = await PDFNet.Stamper.create(
+          PDFNet.Stamper.SizeType.e_relative_scale,
+          0.5,
+          0.5
+        ); // Stamp size is relative to the size of the crop box of the destination page
+        stamper.setAlignment(
+          PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
+          PDFNet.Stamper.VerticalAlignment.e_vertical_center
+        );
+        const redColorPt = await PDFNet.ColorPt.init(0.5, 0, 0);
+        stamper.setFontColor(redColorPt);
+        stamper.setOpacity(0.3);
+        stamper.setRotation(-40);
+        const pgSet = await PDFNet.PageSet.createRange(
+          1,
+          await pdfdoc.getPageCount()
+        );
+
+        const stamtext =
+          (await `${account.firstname}`) +
+          `${account.lastname}` +
+          "\n" +
+          `${account.email}` +
+          "\n" +
+          `${req.body.ip}` +
+          "จำนวนครั้งดาวน์โหลด " +
+          `${account.downloaded}` +
+          time;
+
+        stamper.stampText(pdfdoc, stamtext, pgSet);
+
+        pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
+      };
+
+      PDFNetEndpoint(main, outputPath);
+
+      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
+
+      res.status(200).send(url);
+    });
+  } catch(err) {
+    res.status(500).send({
+      message: err.message
+    })
+  }
 };
 
 exports.deleteFile = (req, res) => {
