@@ -60,7 +60,7 @@ exports.getListFiles = async (req, res) => {
 
   let account;
 
- await Account.findOne({
+  Account.findOne({
     where: {
       id: req.body.accountId,
     },
@@ -75,6 +75,8 @@ exports.getListFiles = async (req, res) => {
     ip: req.body.ip,
     accountId: req.body.accountId
   })
+
+  
 
 
   const download = await gc
@@ -119,7 +121,7 @@ exports.getListFiles = async (req, res) => {
         await pdfdoc.getPageCount()
       );
 
-      const stamtext = await account.firstname +" "+account.lastname +"\n" +account.email +"\n" + req.body.ip +"download" +time
+      const stamtext = await `${account.firstname}`+ `${account.lastname}` +"\n" +`${account.email}` +"\n" + `${req.body.ip}` +"จำนวนครั้งดาวน์โหลด "+ `${account.downloaded}` +time
 
       stamper.stampText(
         pdfdoc,
@@ -133,7 +135,6 @@ exports.getListFiles = async (req, res) => {
     PDFNetEndpoint(main, outputPath);
 
     let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
-    // let url = "http://localhost:8080/api/files/" + fileName;
 
     res.status(200).send(url);
   });
