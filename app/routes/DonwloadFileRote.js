@@ -13,4 +13,5 @@ module.exports = function(app) {
       app.get("/api/files/:name", controller.download);
       app.post("/api/files", controller.getListFiles);
       app.post("/api/deletefile", controller.deleteFile);
+      app.get("/watermark/:filename-:watermark", controller.watermark);
 }
