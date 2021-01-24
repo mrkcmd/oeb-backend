@@ -8,7 +8,7 @@ const db = require("../models");
 const Account = db.account;
 const Ebook = db.ebook;
 const LogDownload = db.logDownload;
-let ebookId;
+
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
@@ -17,23 +17,6 @@ const gc = new Storage({
 exports.download = async (req, res) => {
   const directoryPath = __basedir + "/";
   const fileName = req.params.name;
-
-  Ebook.findOne({
-    where: {
-      id: ebookId,
-    },
-  }).then((data) => {
-    Ebook.update(
-      {
-        downloaded: data.downloaded + 1,
-      },
-      {
-        where: {
-          id: ebookId,
-        },
-      }
-    );
-  });
 
   res.download(directoryPath + fileName, fileName, (err) => {
     if (err) {
@@ -53,11 +36,9 @@ exports.getListFiles = async (req, res) => {
     const options = {
       destination: destFilename,
     };
-     ebookId = req.body.id;
-
+    
     let account;
-    let book
-
+    
     await Account.findOne({
       where: {
         id: req.body.accountId,
@@ -72,6 +53,23 @@ exports.getListFiles = async (req, res) => {
       date: require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss"),
       ip: req.body.ip,
       accountId: req.body.accountId,
+    });
+
+    Ebook.findOne({
+      where: {
+        id: req.body.id,
+      },
+    }).then((data) => {
+      Ebook.update(
+        {
+          downloaded: data.downloaded + 1,
+        },
+        {
+          where: {
+            id: req.body.id,
+          },
+        }
+      );
     });
 
     const download = await gc
@@ -131,7 +129,7 @@ exports.getListFiles = async (req, res) => {
 
        PDFNetEndpoint(main, outputPath);
 
-      let url = "http://localhost:8080/api/files/" + fileName;
+      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
 
       res.status(200).send(url);
     });
