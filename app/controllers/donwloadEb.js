@@ -36,7 +36,6 @@ exports.getListFiles = async (req, res) => {
       destination: destFilename,
     };
 
-    console.log("สัสโง่");
     
     let account;
     
@@ -120,18 +119,18 @@ exports.getListFiles = async (req, res) => {
         );
           
 
-        // let stamtext =
-        // "คุณ"+
-        // account.firstname +
-        // " " + account.lastname +
-        // " Email " + account.email +
-        // "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
-        // "\nโดย IP " + req.body.ip + 
-        // "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
-        // console.log("ควย:",stamtext);
+        let stamtext =
+        "คุณ"+
+        account.firstname +
+        " " + account.lastname +
+        " Email " + account.email +
+        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
+        "\nโดย IP " + req.body.ip + 
+        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
+        console.log("ควย:",stamtext);
 
-        stamper.stampText(pdfdoc, "ควย", pgSet);
-
+        stamper.stampText(pdfdoc, stamtext, pgSet);
+        console.log( "test",stamper.stampText(pdfdoc, stamtext, pgSet));
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
 
       };
