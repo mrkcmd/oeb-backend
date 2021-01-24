@@ -53,7 +53,7 @@ exports.getListFiles = async (req, res) => {
     const options = {
       destination: destFilename,
     };
-    ebookId = req.body.id;
+     ebookId = req.body.id;
 
     let account;
     let book
@@ -67,27 +67,19 @@ exports.getListFiles = async (req, res) => {
     });
     
 
-    LogDownload.create({
+    await LogDownload.create({
       ebook: fileName,
       date: require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss"),
       ip: req.body.ip,
       accountId: req.body.accountId,
     });
 
-    Ebook.findOne({
-      where: {
-        name: fileName
-      }
-    }).then((ebook) => {
-      book = ebook
-    })
-
     const download = await gc
       .bucket("ebook-online")
       .file(fileName)
       .download(options);
 
-    fs.readdir(directoryPath, function (err, files) {
+    await fs.readdir(directoryPath, function (err, files) {
       if (err) {
         res.status(500).send({
           message: "Unable to scan files!",
@@ -100,9 +92,9 @@ exports.getListFiles = async (req, res) => {
         res.statusCode = 500;
         res.end(`File is not a PDF. Please convert it first.`);
       }
-      const inputPath = path.resolve(__basedir, fileName);
-      const outputPath = path.resolve(__basedir, `${fileName}`);
-      const main = async () => {
+       const inputPath =  path.resolve(__basedir, fileName);
+       const outputPath =  path.resolve(__basedir, `${fileName}`);
+      const main =  async () => {
         const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
         await pdfdoc.initSecurityHandler();
 
@@ -129,7 +121,7 @@ exports.getListFiles = async (req, res) => {
         " " + account.lastname +
         "\n" + account.email +
         "\n" + req.body.ip +
-        " Number of downloads " + (book.downloaded+1) + 
+        " Number of downloads " + req.body.downloaded + 
         " "+ require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
 
         stamper.stampText(pdfdoc, stamtext, pgSet);
@@ -137,9 +129,9 @@ exports.getListFiles = async (req, res) => {
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
       };
 
-      PDFNetEndpoint(main, outputPath);
+       PDFNetEndpoint(main, outputPath);
 
-      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
+      let url = "http://localhost:8080/api/files/" + fileName;
 
       res.status(200).send(url);
     });
