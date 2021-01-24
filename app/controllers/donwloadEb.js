@@ -119,8 +119,6 @@ exports.getListFiles = async (req, res) => {
         );
           
         stamper.stampText(pdfdoc, account.firstname, pgSet);
-
-        console.log( "test",stamper.stampText(pdfdoc, stamtext, pgSet));
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
       };
        PDFNetEndpoint(main, outputPath);
