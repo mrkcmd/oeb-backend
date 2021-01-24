@@ -5,9 +5,15 @@ const { Storage } = require("@google-cloud/storage");
 const path = require("path");
 const { PDFNet } = require("@pdftron/pdfnet-node");
 const db = require("../models");
+var PdfLib = require('pdf-lib');
+var PDFDocument = PdfLib.PDFDocument;
+var StandardFonts = PdfLib.StandardFonts;
+var rgb = PdfLib.rgb;
+var fontkit = require("@pdf-lib/fontkit");
 const Account = db.account;
 const Ebook = db.ebook;
 const LogDownload = db.logDownload;
+let file ;
 
 const gc = new Storage({
   keyFilename: config.ebook,
@@ -15,27 +21,25 @@ const gc = new Storage({
 });
 
 exports.download = async (req, res) => {
-  const directoryPath = __basedir + "/";
-  const fileName = req.params.name;
+    createPdf().then(function(pdfBuffer){
+ console.log(pdfBuffer);
 
-  res.download(directoryPath + fileName, fileName, (err) => {
-    if (err) {
-      res.status(500).send({
-        message: "Could not download the file. " + err,
-      });
-    }
-  });
+        res.status(200).type('pdf').send(pdfBuffer)
+    })
+  
 };
 
+    
+	
+
 exports.getListFiles = async (req, res) => {
-  try {
     const directoryPath = __basedir + "/";
     const fileName = req.body.name;
     destFilename = path.join(directoryPath, fileName);
     const options = {
       destination: destFilename,
     };
-
+    file = req.body.name
     
     let account;
     
@@ -77,62 +81,75 @@ exports.getListFiles = async (req, res) => {
       .file(fileName)
       .download(options);
 
-    await fs.readdir(directoryPath, function (err, files) {
-      if (err) {
-        res.status(500).send({
-          message: "Unable to scan files!",
-        });
-      }
+    //   const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+    //   const pages = pdfDoc.getPages()
+    //   pages[0].drawText('This text was added with JavaScript!', {
+    //     x: 5,
+    //     y: 1000 / 2 + 300,
+    //     size: 50,
+    //     font: helveticaFont,
+    //     color: rgb(0.95, 0.1, 0.1),
+    //   })
+    //   const pdfBytes = await pdfDoc.save()
 
-      let ext = path.parse(fileName).ext;
+    
 
-      if (ext !== ".pdf") {
-        res.statusCode = 500;
-        res.end(`File is not a PDF. Please convert it first.`);
-      }
-      const inputPath =  path.resolve(__basedir, fileName);
-      const tempPath = path.resolve(__basedir,"temp.pdf");
-      fs.rename(inputPath,tempPath,(error)=>{
-          console.log(error);
-      });
-       const outputPath =  path.resolve(__basedir, `${fileName}`);
-      const main =  async () => {
-        const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(tempPath);
-        await pdfdoc.initSecurityHandler();
 
-        const stamper = await PDFNet.Stamper.create(
-          PDFNet.Stamper.SizeType.e_relative_scale,
-          0.8,
-          0.8
-        ); // Stamp size is relative to the size of the crop box of the destination page
-        stamper.setAlignment(
-          PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
-          PDFNet.Stamper.VerticalAlignment.e_vertical_center
-        );
-        const redColorPt = await PDFNet.ColorPt.init(0, 0.5, 0.5);
-        stamper.setFontColor(redColorPt);
-        stamper.setOpacity(0.3);
-        stamper.setRotation(-33);
-        const pgSet = await PDFNet.PageSet.createRange(
-          1,
-          await pdfdoc.getPageCount()
-        );
+    // await fs.readdir(directoryPath, function (err, files) {
+    //   if (err) {
+    //     res.status(500).send({
+    //       message: "Unable to scan files!",
+    //     });
+    //   }
+
+    //   let ext = path.parse(fileName).ext;
+
+    //   if (ext !== ".pdf") {
+    //     res.statusCode = 500;
+    //     res.end(`File is not a PDF. Please convert it first.`);
+    //   }
+    //   const inputPath =  path.resolve(__basedir, fileName);
+    //   const tempPath = path.resolve(__basedir,"temp.pdf");
+    //   fs.rename(inputPath,tempPath,(error)=>{
+    //       console.log(error);
+    //   });
+    //    const outputPath =  path.resolve(__basedir, `${fileName}`);
+    //   const main =  async () => {
+    //     const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(tempPath);
+    //     await pdfdoc.initSecurityHandler();
+
+    //     const stamper = await PDFNet.Stamper.create(
+    //       PDFNet.Stamper.SizeType.e_relative_scale,
+    //       0.8,
+    //       0.8
+    //     ); // Stamp size is relative to the size of the crop box of the destination page
+    //     stamper.setAlignment(
+    //       PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
+    //       PDFNet.Stamper.VerticalAlignment.e_vertical_center
+    //     );
+    //     const redColorPt = await PDFNet.ColorPt.init(0, 0.5, 0.5);
+    //     stamper.setFontColor(redColorPt);
+    //     stamper.setOpacity(0.3);
+    //     stamper.setRotation(-33);
+    //     const pgSet = await PDFNet.PageSet.createRange(
+    //       1,
+    //       await pdfdoc.getPageCount()
+    //     );
           
-        stamper.stampText(pdfdoc, account.firstname, pgSet);
-        pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
-      };
-       PDFNetEndpoint(main, outputPath);
+    //     stamper.stampText(pdfdoc, account.firstname, pgSet);
+    //     pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
+    //   };
+    //    PDFNetEndpoint(main, outputPath);
 
-      let url = "https://oeb-backend.herokuapp.com/api/files/" + fileName;
-
+      let url = "http://localhost:8080/api/files/" + fileName;
       res.status(200).send(url);
-    });
-  } catch(err) {
-    res.status(500).send({
-      message: err.message
-    })
-  }
-};
+    // });
+//   } catch(err) {
+//     res.status(500).send({
+//       message: err.message
+//     })
+  };
+
 
 exports.deleteFile = (req, res) => {
   const fileName = req.body.name;
@@ -163,3 +180,29 @@ const PDFNetEndpoint = (main, pathname) => {
       fs.readFile(pathname, (err, data) => {});
     });
 };
+
+
+async function createPdf(){
+    const directoryPath = __basedir + "/";
+    const fileName = file;
+    const fontBytes = fs.readFileSync(directoryPath+"app/assets/fonts/THSarabunNew.ttf");
+    // var pdfDoc = await PDFDocument.create();
+      const fileBytes = fs.readFileSync(directoryPath+fileName)
+      const pdfDoc = await PDFDocument.load(fileBytes)
+
+    pdfDoc.registerFontkit(fontkit)
+	var helveticaFont = await pdfDoc.embedFont(fontBytes);
+	var page = pdfDoc.getPages();
+	var { width, height } = page[0].getSize();
+	var fontSize = 30;
+	page[0].drawText('ทดสอบเว้ยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยย ทดสอบ', {
+		x: 50,
+		y: height - 4 * fontSize,
+		size: fontSize,
+		font: helveticaFont,
+		color: rgb(0, 0.53, 0.71),
+	});
+    var pdfBytes = await pdfDoc.save();
+    var pdfBuffer = Buffer.from(pdfBytes.buffer, 'binary');
+    return pdfBuffer;
+}
