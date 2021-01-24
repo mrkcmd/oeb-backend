@@ -35,6 +35,8 @@ exports.getListFiles = async (req, res) => {
     const options = {
       destination: destFilename,
     };
+
+    console.log("สัสโง่");
     
     let account;
     
