@@ -129,7 +129,7 @@ exports.getListFiles = async (req, res) => {
         " " + account.lastname +
         "\n" + account.email +
         "\n" + req.body.ip +
-        " จำนวนครั้งดาวน์โหลด " + (book.downloaded+1) + 
+        " Number of downloads " + (book.downloaded+1) + 
         " "+ require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
 
         stamper.stampText(pdfdoc, stamtext, pgSet);
