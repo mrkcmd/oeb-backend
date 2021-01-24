@@ -120,13 +120,12 @@ exports.getListFiles = async (req, res) => {
           
         stamper.stampText(pdfdoc, account.firstname, pgSet);
 
-        stamper.stampText(pdfdoc, stamtext, pgSet);
         console.log( "test",stamper.stampText(pdfdoc, stamtext, pgSet));
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
       };
        PDFNetEndpoint(main, outputPath);
 
-      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
+      let url = "http://localhost:8080/api/files/" + fileName;
 
       res.status(200).send(url);
     });
