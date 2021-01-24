@@ -117,16 +117,8 @@ exports.getListFiles = async (req, res) => {
           await pdfdoc.getPageCount()
         );
 
-        let stamtext =
-        "คุณ"+
-        account.firstname +
-        " " + account.lastname +
-        " Email " + account.email +
-        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
-        "\nโดย IP " + req.body.ip + 
-        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
 
-        stamper.stampText(pdfdoc, stamtext, pgSet);
+        stamper.stampText(pdfdoc, account.firstname, pgSet);
 
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
       };
