@@ -102,8 +102,8 @@ exports.getListFiles = async (req, res) => {
 
         const stamper = await PDFNet.Stamper.create(
           PDFNet.Stamper.SizeType.e_relative_scale,
-          0.8,
-          0.8
+          0.6,
+          0.6
         ); // Stamp size is relative to the size of the crop box of the destination page
         stamper.setAlignment(
           PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
@@ -117,13 +117,16 @@ exports.getListFiles = async (req, res) => {
           1,
           await pdfdoc.getPageCount()
         );
-          
-        stamper.stampText(pdfdoc, account.firstname, pgSet);
+        let stamText = account.firstname+" " +account.lastname+" "+" Email "+account.email+
+        "\nDownload "+req.body.downloaded+
+        "\nWith IP "+req.body.ip+
+        "\n on "+require("moment")().add(7,"hours").format("DD/MM/YYYY")+" at "+require("moment")().add(7, "hours").format("HH:mm:ss")  
+        stamper.stampText(pdfdoc, stamText, pgSet);
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
       };
        PDFNetEndpoint(main, outputPath);
 
-      let url = "https://oeb-backend.herokuapp.com/api/files/" + fileName;
+      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
 
       res.status(200).send(url);
     });
