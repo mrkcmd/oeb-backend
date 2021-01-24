@@ -92,10 +92,14 @@ exports.getListFiles = async (req, res) => {
         res.statusCode = 500;
         res.end(`File is not a PDF. Please convert it first.`);
       }
-       const inputPath =  path.resolve(__basedir, fileName);
+      const inputPath =  path.resolve(__basedir, fileName);
+      const tempPath = path.resolve(__basedir,"temp.pdf");
+      fs.rename(inputPath,tempPath,(error)=>{
+          console.log(error);
+      });
        const outputPath =  path.resolve(__basedir, `${fileName}`);
       const main =  async () => {
-        const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(inputPath);
+        const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(tempPath);
         await pdfdoc.initSecurityHandler();
 
         const stamper = await PDFNet.Stamper.create(
@@ -146,8 +150,14 @@ exports.deleteFile = (req, res) => {
   const fileName = req.body.name;
 
   const path = __basedir + "/" + fileName;
-
+  const tempPath = __basedir + "/temp.pdf";
   fs.unlink(path, (err) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+  });
+  fs.unlink(tempPath, (err) => {
     if (err) {
       console.error(err);
       return;
