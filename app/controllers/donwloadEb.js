@@ -35,6 +35,7 @@ exports.getListFiles = async (req, res) => {
     const options = {
       destination: destFilename,
     };
+
     
     let account;
     
@@ -116,12 +117,41 @@ exports.getListFiles = async (req, res) => {
           1,
           await pdfdoc.getPageCount()
         );
+          
 
+<<<<<<< HEAD
 
         stamper.stampText(pdfdoc, account.firstname, pgSet);
 
+||||||| 8669c0c
+        let stamtext =
+        "คุณ"+
+        account.firstname +
+        " " + account.lastname +
+        " Email " + account.email +
+        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
+        "\nโดย IP " + req.body.ip + 
+        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
+
+        stamper.stampText(pdfdoc, stamtext, pgSet);
+
+        let stamtext =
+        "คุณ"+
+        account.firstname +
+        " " + account.lastname +
+        " Email " + account.email +
+        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
+        "\nโดย IP " + req.body.ip + 
+        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
+        console.log("ควย:",stamtext);
+
+        stamper.stampText(pdfdoc, stamtext, pgSet);
+        console.log( "test",stamper.stampText(pdfdoc, stamtext, pgSet));
         pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
+
       };
+
+
 
        PDFNetEndpoint(main, outputPath);
 
