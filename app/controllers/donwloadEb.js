@@ -31,7 +31,6 @@ exports.getListFiles = async (req, res) => {
   try {
     const directoryPath = __basedir + "/";
     const fileName = req.body.name;
-
     destFilename = path.join(directoryPath, fileName);
     const options = {
       destination: destFilename,
@@ -102,29 +101,30 @@ exports.getListFiles = async (req, res) => {
 
         const stamper = await PDFNet.Stamper.create(
           PDFNet.Stamper.SizeType.e_relative_scale,
-          0.5,
-          0.5
+          0.8,
+          0.8
         ); // Stamp size is relative to the size of the crop box of the destination page
         stamper.setAlignment(
           PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
           PDFNet.Stamper.VerticalAlignment.e_vertical_center
         );
-        const redColorPt = await PDFNet.ColorPt.init(0.5, 0, 0);
+        const redColorPt = await PDFNet.ColorPt.init(0, 0.5, 0.5);
         stamper.setFontColor(redColorPt);
         stamper.setOpacity(0.3);
-        stamper.setRotation(-40);
+        stamper.setRotation(-33);
         const pgSet = await PDFNet.PageSet.createRange(
           1,
           await pdfdoc.getPageCount()
         );
 
         let stamtext =
+        "คุณ"+
         account.firstname +
         " " + account.lastname +
-        "\n" + account.email +
-        "\n" + req.body.ip +
-        " Number of downloads " + req.body.downloaded + 
-        " "+ require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
+        " Email " + account.email +
+        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
+        "\nโดย IP " + req.body.ip + 
+        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
 
         stamper.stampText(pdfdoc, stamtext, pgSet);
 
