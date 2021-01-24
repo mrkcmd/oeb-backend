@@ -8,7 +8,6 @@ const db = require("../models");
 const Account = db.account;
 const Ebook = db.ebook;
 const LogDownload = db.logDownload;
-var time = require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
 let ebookId;
 const gc = new Storage({
   keyFilename: config.ebook,
@@ -59,7 +58,7 @@ exports.getListFiles = async (req, res) => {
     let account;
     let book
 
-    Account.findOne({
+    await Account.findOne({
       where: {
         id: req.body.accountId,
       },
@@ -70,7 +69,7 @@ exports.getListFiles = async (req, res) => {
 
     LogDownload.create({
       ebook: fileName,
-      date: time,
+      date: require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss"),
       ip: req.body.ip,
       accountId: req.body.accountId,
     });
@@ -125,16 +124,13 @@ exports.getListFiles = async (req, res) => {
           await pdfdoc.getPageCount()
         );
 
-        const stamtext =
-          (await `${account.firstname}`) +
-          `${account.lastname}` +
-          "\n" +
-          `${account.email}` +
-          "\n" +
-          `${req.body.ip}` +
-          "จำนวนครั้งดาวน์โหลด " +
-          `${book.downloaded}` +
-          time;
+        let stamtext =
+        account.firstname +
+        " " + account.lastname +
+        "\n" + account.email +
+        "\n" + req.body.ip +
+        " จำนวนครั้งดาวน์โหลด " + (book.downloaded+1) + 
+        " "+ require("moment")().add(7, "hours").format("DD-MM-YYYY HH:mm:ss");
 
         stamper.stampText(pdfdoc, stamtext, pgSet);
 
