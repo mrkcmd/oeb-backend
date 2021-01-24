@@ -123,7 +123,7 @@ exports.getListFiles = async (req, res) => {
       };
        PDFNetEndpoint(main, outputPath);
 
-      let url = "http://localhost:8080/api/files/" + fileName;
+      let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
 
       res.status(200).send(url);
     });
