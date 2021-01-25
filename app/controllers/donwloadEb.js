@@ -12,7 +12,7 @@ var PDFDocument = PdfLib.PDFDocument;
 var StandardFonts = PdfLib.StandardFonts;
 var rgb = PdfLib.rgb;
 var fontkit = require("@pdf-lib/fontkit");
-
+var degrees = PdfLib.degrees;
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
@@ -89,7 +89,7 @@ exports.getListFiles = async (req, res) => {
       "\nเมื่อวันที่ "+require("moment")().add(7,"hours").format("DD/MM/YYYY")+" เวลา "+require("moment")().add(7, "hours").format("HH:mm:ss")
 
       pdfDoc.registerFontkit(fontkit);
-      var helveticaFont = await pdfDoc.embedFont(fontBytes);
+      var sarabunFont = await pdfDoc.embedFont(fontBytes);
       var page = pdfDoc.getPages();
       var { width, height } = page[0].getSize();
       var fontSize = 30;
@@ -97,10 +97,12 @@ exports.getListFiles = async (req, res) => {
         page[index].drawText(
            stamText,
           {
-            x: 50,
-            y: height / 2,
+            x: width / 4,
+            y: (height / 2) - 60,
             size: fontSize,
-            font: helveticaFont,
+            opacity: 0.33,
+            rotate: degrees(45),
+            font: sarabunFont,
             color: rgb(0, 0.53, 0.71),
           }
         );
