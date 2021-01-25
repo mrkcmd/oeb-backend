@@ -85,15 +85,19 @@ exports.getListFiles = async (req, res) => {
       const fileBytes = fs.readFileSync(directoryPath+fileName)
       const pdfDoc = await PDFDocument.load(fileBytes)
 
+      let stamText ="คุณ "+ account.firstname+" " +account.lastname+" "+" อีเมล "+account.email+
+      "\nได้ทำการดาวน์โหลดเป็นครั้งที่ "+req.body.downloaded+
+      "\nโดย IP "+req.body.ip+
+      "\nเมื่อวันที่ "+require("moment")().add(7,"hours").format("DD/MM/YYYY")+" เวลา "+require("moment")().add(7, "hours").format("HH:mm:ss")
+
       pdfDoc.registerFontkit(fontkit);
       var helveticaFont = await pdfDoc.embedFont(fontBytes);
       var page = pdfDoc.getPages();
       var { width, height } = page[0].getSize();
       var fontSize = 30;
-      console.log(height);
       for (let index = 0; index < page.length; index++) {
         page[index].drawText(
-          "ทดสอบเว้ยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยย ทดสอบ",
+           stamText,
           {
             x: 50,
             y: height / 2,
