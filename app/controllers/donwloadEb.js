@@ -9,6 +9,12 @@ const Account = db.account;
 const Ebook = db.ebook;
 const LogDownload = db.logDownload;
 
+var PdfLib = require("pdf-lib");
+var PDFDocument = PdfLib.PDFDocument;
+var StandardFonts = PdfLib.StandardFonts;
+var rgb = PdfLib.rgb;
+var fontkit = require("@pdf-lib/fontkit");
+
 const gc = new Storage({
   keyFilename: config.ebook,
   projectId: "ebook-onlline",
@@ -28,7 +34,7 @@ exports.download = async (req, res) => {
 };
 
 exports.getListFiles = async (req, res) => {
-  try {
+ 
     const directoryPath = __basedir + "/";
     const fileName = req.body.name;
     destFilename = path.join(directoryPath, fileName);
@@ -36,9 +42,8 @@ exports.getListFiles = async (req, res) => {
       destination: destFilename,
     };
 
-    
     let account;
-    
+
     await Account.findOne({
       where: {
         id: req.body.accountId,
@@ -46,7 +51,6 @@ exports.getListFiles = async (req, res) => {
     }).then((data) => {
       account = data;
     });
-    
 
     await LogDownload.create({
       ebook: fileName,
@@ -77,73 +81,35 @@ exports.getListFiles = async (req, res) => {
       .file(fileName)
       .download(options);
 
-    await fs.readdir(directoryPath, function (err, files) {
-      if (err) {
-        res.status(500).send({
-          message: "Unable to scan files!",
-        });
+      const fontBytes = fs.readFileSync(directoryPath+"app/assets/fonts/THSarabunNew.ttf");
+      const fileBytes = fs.readFileSync(directoryPath+fileName)
+      const pdfDoc = await PDFDocument.load(fileBytes)
+
+      pdfDoc.registerFontkit(fontkit);
+      var helveticaFont = await pdfDoc.embedFont(fontBytes);
+      var page = pdfDoc.getPages();
+      var { width, height } = page[0].getSize();
+      var fontSize = 30;
+      console.log(height);
+      for (let index = 0; index < page.length; index++) {
+        page[index].drawText(
+          "ทดสอบเว้ยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยยย ทดสอบ",
+          {
+            x: 50,
+            y: height / 2,
+            size: fontSize,
+            font: helveticaFont,
+            color: rgb(0, 0.53, 0.71),
+          }
+        );
       }
 
-      let ext = path.parse(fileName).ext;
-
-      if (ext !== ".pdf") {
-        res.statusCode = 500;
-        res.end(`File is not a PDF. Please convert it first.`);
-      }
-      const inputPath =  path.resolve(__basedir, fileName);
-      const tempPath = path.resolve(__basedir,"temp.pdf");
-      fs.rename(inputPath,tempPath,(error)=>{
-          console.log(error);
-      });
-       const outputPath =  path.resolve(__basedir, `${fileName}`);
-      const main =  async () => {
-        const pdfdoc = await PDFNet.PDFDoc.createFromFilePath(tempPath);
-        await pdfdoc.initSecurityHandler();
-
-        const stamper = await PDFNet.Stamper.create(
-          PDFNet.Stamper.SizeType.e_relative_scale,
-          0.8,
-          0.8
-        ); // Stamp size is relative to the size of the crop box of the destination page
-        stamper.setAlignment(
-          PDFNet.Stamper.HorizontalAlignment.e_horizontal_center,
-          PDFNet.Stamper.VerticalAlignment.e_vertical_center
-        );
-        const redColorPt = await PDFNet.ColorPt.init(0, 0.5, 0.5);
-        stamper.setFontColor(redColorPt);
-        stamper.setOpacity(0.3);
-        stamper.setRotation(-33);
-        const pgSet = await PDFNet.PageSet.createRange(
-          1,
-          await pdfdoc.getPageCount()
-        );
-          
-        let stamtext =
-        "คุณ"+
-        account.firstname +
-        " " + account.lastname +
-        " Email " + account.email +
-        "\nได้ทำการดาวน์โหลดเป็นครั้งที่ " + req.body.downloaded +
-        "\nโดย IP " + req.body.ip + 
-        "\nเมื่อวันที่ "+ require("moment")().format("DD/MM/YYYY")+ " เวลา "+require("moment")().add(7,"hours").format("HH:mm:ss");
-
-        stamper.stampText(pdfdoc, stamtext, pgSet);
-       
-        pdfdoc.save(outputPath, PDFNet.SDFDoc.SaveOptions.e_linearized);
-
-      };
-
-       PDFNetEndpoint(main, outputPath);
+      fs.writeFileSync("./" + fileName, await pdfDoc.save());
 
       let url = "https://pdx-ebook.herokuapp.com/api/files/" + fileName;
 
       res.status(200).send(url);
-    });
-  } catch(err) {
-    res.status(500).send({
-      message: err.message
-    })
-  }
+  
 };
 
 exports.deleteFile = (req, res) => {
