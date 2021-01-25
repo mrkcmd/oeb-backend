@@ -5,9 +5,8 @@ const app = express();
 
 global.__basedir = __dirname;
 
-
 var corsOptions = {
-  origin: ["https://floating-scrubland-13461.herokuapp.com", "http://localhost:8081"],
+  origin: "https://floating-scrubland-13461.herokuapp.com",
   optionsSuccessStatus: 200,
 };
 
@@ -36,7 +35,6 @@ app.get("/", (req, res) => {
 });
 
 // routes
-require("./app/routes/AccountRote")(app);
 require("./app/routes/AuthRote")(app);
 require("./app/routes/GenerateUrlRote")(app);
 require("./app/routes/EbookRote")(app);

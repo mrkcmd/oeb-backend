@@ -1,5 +1,4 @@
-var fs = require("fs");
-var config = require("../../config.json");
+
 module.exports = {
   HOST: "hwr4wkxs079mtb19.cbetxkdyhwsb.us-east-1.rds.amazonaws.com",
   USER: "bwd3q500jenjevuo",

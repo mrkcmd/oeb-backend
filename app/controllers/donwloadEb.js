@@ -1,9 +1,7 @@
 const fs = require("fs");
 var config = require("../../config.json");
-const request = require("request");
 const { Storage } = require("@google-cloud/storage");
 const path = require("path");
-const { PDFNet } = require("@pdftron/pdfnet-node");
 const db = require("../models");
 const Account = db.account;
 const Ebook = db.ebook;
@@ -138,10 +136,3 @@ exports.deleteFile = (req, res) => {
   });
 };
 
-const PDFNetEndpoint = (main, pathname) => {
-  PDFNet.runWithCleanup(main) // you can add the key to PDFNet.runWithCleanup(main, process.env.PDFTRONKEY)
-    .then(() => {
-      PDFNet.shutdown();
-      fs.readFile(pathname, (err, data) => {});
-    });
-};
