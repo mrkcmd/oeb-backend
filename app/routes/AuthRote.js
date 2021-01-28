@@ -19,6 +19,15 @@ module.exports = function(app) {
     controller.signup
   );
 
+  app.post(
+      "/api/auth/signupAdmin",
+      [
+        verifySignUp.checkDuplicateEmail,
+        verifySignUp.checkRolesExisted
+      ],
+      controller.signupAdmin
+  );
+
   app.post("/api/auth/signin", controller.signin);
 
   app.post("/api/auth/logout", controller.logOut);
