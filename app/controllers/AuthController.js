@@ -1,6 +1,5 @@
 const db = require("../models");
 const config = require("../config/auth.config");
-
 const Account = db.account;
 const Role = db.role;
 const Log = db.log;
