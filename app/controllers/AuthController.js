@@ -5,7 +5,7 @@ const Role = db.role;
 const Log = db.log;
 const Op = db.Sequelize.Op;
 const Token = db.token;
-
+const Ebook = db.ebook
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const { request } = require("express");
@@ -25,6 +25,25 @@ exports.signup = (req, res) => {
           password: bcrypt.hashSync(req.body.password, 8),
         })
           .then((account) => {
+
+            req.body.ebooks.forEach((ebook) => {
+
+              Ebook.create({
+                name: ebook,
+                purchased: require("moment")()
+                  .add(7, "hours")
+                  .format("DD-MM-YYYY HH:mm:ss"),
+                //   ip: req.body.ip,
+                //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+                downloaded: 0,
+                accountId: account.id,
+              })
+
+            })
+
+
+           
+            
             if (req.body.roles) {
               Role.findAll({
                 where: {
