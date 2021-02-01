@@ -26,23 +26,23 @@ exports.signup = (req, res) => {
         })
           .then((account) => {
 
-            req.body.ebooks.forEach((ebook) => {
+            if(req.body.ebooks){
+              req.body.ebooks.forEach((ebook) => {
 
-              Ebook.create({
-                name: ebook,
-                purchased: require("moment")()
-                  .add(7, "hours")
-                  .format("DD-MM-YYYY HH:mm:ss"),
-                //   ip: req.body.ip,
-                //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
-                downloaded: 0,
-                accountId: account.id,
+                Ebook.create({
+                  name: ebook,
+                  purchased: require("moment")()
+                    .add(7, "hours")
+                    .format("DD-MM-YYYY HH:mm:ss"),
+                  //   ip: req.body.ip,
+                  //   download: require("moment")().format("DD-MM-YYYY HH:mm:ss"),
+                  downloaded: 0,
+                  accountId: account.id,
+                })
+  
               })
+            }
 
-            })
-
-
-           
             
             if (req.body.roles) {
               Role.findAll({
