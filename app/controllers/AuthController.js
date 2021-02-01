@@ -80,6 +80,46 @@ exports.signup = (req, res) => {
   // Save User to Database
 };
 
+exports.signupAdmin = (req,res) => {
+    console.log(res.body);
+    Account.create({
+        firstname: req.body.firstname,
+        lastname: req.body.lastname,
+        email: req.body.email,
+        password: bcrypt.hashSync(req.body.password, 8),
+      })
+        .then((account) => {
+          if (req.body.roles) {
+            Role.findAll({
+              where: {
+                name: {
+                  [Op.or]: req.body.roles,
+                },
+              },
+            }).then((roles) => {
+              account.setRoles(roles).then(() => {
+                res
+                  .status(200)
+                  .send({ message: "User registered successfully!" });
+              });
+            });
+          } else {
+            // user role = 1
+            account.setRoles([1]).then(() => {
+              res
+                .status(200)
+                .send({ message: "User registered successfully!" });
+            });
+          }
+        })
+        .catch((err) => {
+          res.status(500).send({ message: err.message });
+        });
+  // Save Admin to Database
+
+};
+
+
 exports.signin = (req, res) => {
   Account.findOne({
     where: {
