@@ -6,7 +6,7 @@ const app = express();
 global.__basedir = __dirname;
 
 var corsOptions = {
-  origin: "https://floating-scrubland-13461.herokuapp.com",
+  origin: "https://ebook-taksaonline-backend.herokuapp.com",
   optionsSuccessStatus: 200,
 };
 
