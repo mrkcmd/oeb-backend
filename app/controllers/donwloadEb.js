@@ -110,7 +110,7 @@ exports.getListFiles = async (req, res) => {
 
       fs.writeFileSync("./" + fileName, await pdfDoc.save());
 
-      let url = "http://ebook.taksaonline.com/api/files/" + fileName;
+      let url = "https://ebook-taksaonline-backend.herokuapp.com/api/files/" + fileName;
 
       res.status(200).send(url);
   
